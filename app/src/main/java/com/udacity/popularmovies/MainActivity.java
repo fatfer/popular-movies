@@ -3,19 +3,25 @@ package com.udacity.popularmovies;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
+import android.widget.TextView;
 
 import com.udacity.popularmovies.Utils.Json;
 import com.udacity.popularmovies.Utils.Network;
 import com.udacity.popularmovies.model.Movie;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
+import butterknife.BindView;
+
 public class MainActivity extends AppCompatActivity {
+
+    @BindView(R.id.rv_movies)
+    RecyclerView rv_movies;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
