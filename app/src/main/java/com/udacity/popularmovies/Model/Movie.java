@@ -1,4 +1,4 @@
-package com.udacity.popularmovies.model;
+package com.udacity.popularmovies.Model;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package com.udacity.popularmovies.Utils;
 
 import android.support.annotation.NonNull;
-import com.udacity.popularmovies.model.Movie;
+import com.udacity.popularmovies.Model.Movie;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
