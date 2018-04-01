@@ -8,8 +8,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
 import com.udacity.popularmovies.MainActivity;
 import com.udacity.popularmovies.Model.Movie;
 import com.udacity.popularmovies.R;
@@ -48,8 +50,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         View view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
         MovieViewHolder viewHolder = new MovieViewHolder(view);
 
-        viewHolder.tv_title.setText("ViewHolder index: " + viewHolderCount);
-
         return viewHolder;
     }
 
@@ -68,6 +68,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
         @BindView(R.id.tv_title)
         TextView tv_title;
+        @BindView(R.id.iv_poster)
+        ImageView iv_poster;
 
         public MovieViewHolder(View itemView) {
             super(itemView);
@@ -77,7 +79,15 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         }
 
         void bind(int listIndex) {
-            tv_title.setText(mMovies.get(listIndex).getTitle());
+            Movie movie = mMovies.get(listIndex);
+            String baseUrl = "http://image.tmdb.org/t/p/";
+
+            tv_title.setText(movie.getTitle());
+            Picasso.get()
+                    .load(baseUrl + "w342" + movie.getPosterPath())
+                    .placeholder(R.mipmap.ic_launcher)
+                    .error(R.mipmap.ic_launcher)
+                    .into(iv_poster);
         }
 
         @Override
