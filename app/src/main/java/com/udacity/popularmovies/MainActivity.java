@@ -1,5 +1,6 @@
 package com.udacity.popularmovies;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,8 +26,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     @BindView(R.id.rv_movies)
     RecyclerView rv_movies;
-    private Toast mToast;
     private MovieAdapter mAdapter;
+    private List<Movie> mMovies;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,24 +40,24 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     }
 
-    public void drawMovies(List<Movie> movies){
+    public void drawMovies(){
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         rv_movies.setLayoutManager(layoutManager);
         rv_movies.setHasFixedSize(true);
 
-        mAdapter = new MovieAdapter(movies, this);
+        mAdapter = new MovieAdapter(mMovies, this);
         rv_movies.setAdapter(mAdapter);
+    }
+
+    private void launchDetailActivity(int position) {
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra(DetailActivity.EXTRA_MOVIE, mMovies.get(position));
+        startActivity(intent);
     }
 
     @Override
     public void onListItemClick(int clickedItemIndex) {
-        if (mToast != null) {
-            mToast.cancel();
-        }
-        String toastMessage = "Item #" + clickedItemIndex + " clicked.";
-        mToast = Toast.makeText(this, toastMessage, Toast.LENGTH_LONG);
-
-        mToast.show();
+        launchDetailActivity(clickedItemIndex);
     }
 
 
@@ -83,8 +84,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         protected void onPostExecute(String searchResults) {
             if (searchResults != null && !searchResults.equals("")) {
                 try {
-                    List<Movie> movies = Json.parseMoviesJson(searchResults);
-                    drawMovies(movies);
+                    mMovies = Json.parseMoviesJson(searchResults);
+                    drawMovies();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

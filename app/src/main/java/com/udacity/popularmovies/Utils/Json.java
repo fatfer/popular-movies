@@ -40,7 +40,7 @@ public class Json {
     }
 
     @NonNull
-    private static Movie getMovie(JSONObject result) throws JSONException {
+    public static Movie getMovie(JSONObject result) throws JSONException {
         Movie movie = new Movie();
 
         movie.setPosterPath(result.optString(JSON_POSTER_PATH_KEY));

@@ -1,8 +1,9 @@
 package com.udacity.popularmovies.Model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Movie {
+public class Movie implements Serializable {
 
     private String posterPath;
     private boolean adult;
