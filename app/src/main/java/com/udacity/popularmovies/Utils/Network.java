@@ -13,11 +13,27 @@ import java.util.Scanner;
 
 public class Network {
 
-    private final static String THEMOVIEDB_BASE_URL = "https://api.themoviedb.org/3/movie/popular";
+    private final static String THEMOVIEDB_BASE_POPULAR_URL = "https://api.themoviedb.org/3/movie/popular";
+    private final static String THEMOVIEDB_BASE_HIGHEST_RATED_URL = "https://api.themoviedb.org/3/movie/top_rated";
     private final static String PARAM_API_KEY = "api_key";
 
     public static URL buildPopularMoviesUrl() {
-        Uri builtUri = Uri.parse(THEMOVIEDB_BASE_URL).buildUpon()
+        Uri builtUri = Uri.parse(THEMOVIEDB_BASE_POPULAR_URL).buildUpon()
+                .appendQueryParameter(PARAM_API_KEY, BuildConfig.THE_MOVIE_DB_API_KEY)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return url;
+    }
+
+    public static URL buildHighestRatedMoviesUrl() {
+        Uri builtUri = Uri.parse(THEMOVIEDB_BASE_HIGHEST_RATED_URL).buildUpon()
                 .appendQueryParameter(PARAM_API_KEY, BuildConfig.THE_MOVIE_DB_API_KEY)
                 .build();
 
