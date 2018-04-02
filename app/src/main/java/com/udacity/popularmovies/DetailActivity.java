@@ -2,23 +2,14 @@ package com.udacity.popularmovies;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
-import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.udacity.popularmovies.Model.Movie;
-import com.udacity.popularmovies.Utils.Json;
-
-import org.json.JSONException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,7 +40,7 @@ public class DetailActivity extends AppCompatActivity {
             closeOnError();
         }
 
-        Movie movie = (Movie) intent.getSerializableExtra(EXTRA_MOVIE);
+        Movie movie = (Movie) (intent != null ? intent.getSerializableExtra(EXTRA_MOVIE) : null);
 
         if (movie == null) {
             // Sandwich data unavailable

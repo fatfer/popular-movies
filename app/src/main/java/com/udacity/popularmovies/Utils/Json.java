@@ -40,7 +40,7 @@ public class Json {
     }
 
     @NonNull
-    public static Movie getMovie(JSONObject result) throws JSONException {
+    private static Movie getMovie(JSONObject result) throws JSONException {
         Movie movie = new Movie();
 
         movie.setPosterPath(result.optString(JSON_POSTER_PATH_KEY));
@@ -61,7 +61,7 @@ public class Json {
         return movie;
     }
 
-    public static List<String> jsonArrayToList (JSONArray array) throws JSONException {
+    private static List<String> jsonArrayToList(JSONArray array) throws JSONException {
         ArrayList<String> list = new ArrayList<>();
 
         for( int i = 0; i < array.length(); i++){

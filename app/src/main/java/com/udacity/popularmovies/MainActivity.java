@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     @BindView(R.id.rv_movies) RecyclerView rv_movies;
     @BindView(R.id.spinner_order_by) Spinner spinner_order_by;
     @BindView(R.id.progressBar) ProgressBar progressBar;
-    private MovieAdapter mAdapter;
     private List<Movie> mMovies;
 
     @Override
@@ -75,13 +74,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         return super.onOptionsItemSelected(item);
     }
 
-    public void drawMovies(){
+    private void drawMovies(){
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         rv_movies.setLayoutManager(layoutManager);
         rv_movies.setHasFixedSize(true);
 
-        mAdapter = new MovieAdapter(mMovies, this);
-        rv_movies.setAdapter(mAdapter);
+        MovieAdapter adapter = new MovieAdapter(mMovies, this);
+        rv_movies.setAdapter(adapter);
     }
 
     private void launchDetailActivity(int position) {

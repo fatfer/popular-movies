@@ -12,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-import com.udacity.popularmovies.MainActivity;
 import com.udacity.popularmovies.Model.Movie;
 import com.udacity.popularmovies.R;
 
@@ -23,9 +22,8 @@ import butterknife.ButterKnife;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder>{
     private static final String TAG = MovieAdapter.class.getSimpleName();
-    private static int viewHolderCount;
-    private int mNumberItems;
-    private List<Movie> mMovies;
+    private final int mNumberItems;
+    private final List<Movie> mMovies;
     final private ListItemClickListener mOnClickListener;
 
     public interface ListItemClickListener {
@@ -36,7 +34,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         mMovies = movies;
         mNumberItems = movies.size();
         this.mOnClickListener = mOnClickListener;
-        viewHolderCount = 0;
     }
 
     @NonNull
@@ -48,9 +45,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         boolean shouldAttachToParentImmediately = false;
 
         View view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
-        MovieViewHolder viewHolder = new MovieViewHolder(view);
 
-        return viewHolder;
+        return new MovieViewHolder(view);
     }
 
     @Override
