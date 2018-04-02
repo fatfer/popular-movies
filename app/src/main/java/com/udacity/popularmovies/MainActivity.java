@@ -2,8 +2,8 @@ package com.udacity.popularmovies;
 
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -17,9 +17,9 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.udacity.popularmovies.Adapter.MovieAdapter;
+import com.udacity.popularmovies.Model.Movie;
 import com.udacity.popularmovies.Utils.Json;
 import com.udacity.popularmovies.Utils.Network;
-import com.udacity.popularmovies.Model.Movie;
 
 import org.json.JSONException;
 
@@ -29,6 +29,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.udacity.popularmovies.Utils.Network.isInternetAvailable;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ListItemClickListener,AdapterView.OnItemSelectedListener {
 
@@ -43,15 +45,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.order_by_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner_order_by.setAdapter(adapter);
         spinner_order_by.setOnItemSelectedListener(this);
-
-        URL popularMoviesUrl = Network.buildPopularMoviesUrl();
-        new TheMovieDBQueryTask().execute(popularMoviesUrl);
 
     }
 
@@ -98,13 +96,18 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long l) {
 
         final String value = (String) adapterView.getItemAtPosition(pos);
-        if (value.equals(getString(R.string.most_popular))) {
-            URL popularMoviesUrl = Network.buildPopularMoviesUrl();
-            new TheMovieDBQueryTask().execute(popularMoviesUrl);
-        }
-        else if (value.equals(getString(R.string.highest_rated))) {
-            URL highestRatedMoviesUrl = Network.buildHighestRatedMoviesUrl();
-            new TheMovieDBQueryTask().execute(highestRatedMoviesUrl);
+
+        if (isInternetAvailable(this)) {
+            if (value.equals(getString(R.string.most_popular))) {
+                URL popularMoviesUrl = Network.buildPopularMoviesUrl();
+                new TheMovieDBQueryTask().execute(popularMoviesUrl);
+            }
+            else if (value.equals(getString(R.string.highest_rated))) {
+                URL highestRatedMoviesUrl = Network.buildHighestRatedMoviesUrl();
+                new TheMovieDBQueryTask().execute(highestRatedMoviesUrl);
+            }
+        }else{
+            Toast.makeText(MainActivity.this, R.string.get_data_from_api_error, Toast.LENGTH_SHORT).show();
         }
     }
 
