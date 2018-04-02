@@ -98,13 +98,16 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         final String value = (String) adapterView.getItemAtPosition(pos);
 
         if (isInternetAvailable(this)) {
+            progressBar.setVisibility(View.VISIBLE);
             if (value.equals(getString(R.string.most_popular))) {
                 URL popularMoviesUrl = Network.buildPopularMoviesUrl();
-                new TheMovieDBQueryTask().execute(popularMoviesUrl);
+                new TheMovieDBQueryTask(this, new TheMovieDBQueryTaskCompleteListener())
+                        .execute(popularMoviesUrl);
             }
             else if (value.equals(getString(R.string.highest_rated))) {
                 URL highestRatedMoviesUrl = Network.buildHighestRatedMoviesUrl();
-                new TheMovieDBQueryTask().execute(highestRatedMoviesUrl);
+                new TheMovieDBQueryTask(this, new TheMovieDBQueryTaskCompleteListener())
+                        .execute(highestRatedMoviesUrl);
             }
         }else{
             Toast.makeText(MainActivity.this, R.string.get_data_from_api_error, Toast.LENGTH_SHORT).show();
@@ -116,41 +119,15 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     }
 
-
-    public class TheMovieDBQueryTask extends AsyncTask<URL, Void, String> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressBar.setVisibility(View.VISIBLE);
-        }
+    public class TheMovieDBQueryTaskCompleteListener implements AsyncTaskCompleteListener<List<Movie>>
+    {
 
         @Override
-        protected String doInBackground(URL... params) {
-            URL apiUrl = params[0];
-            String searchResults = null;
-            try {
-                searchResults = Network.getResponseFromHttpUrl(apiUrl);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return searchResults;
-        }
-
-        @Override
-        protected void onPostExecute(String searchResults) {
+        public void onTaskComplete(List<Movie> result) {
             progressBar.setVisibility(View.INVISIBLE);
-            if (searchResults != null && !searchResults.equals("")) {
-                try {
-                    mMovies = Json.parseMoviesJson(searchResults);
-                    drawMovies();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }else{
-                Toast.makeText(MainActivity.this, R.string.get_data_from_api_error, Toast.LENGTH_SHORT).show();
-            }
-
+            mMovies = result;
+            drawMovies();
         }
     }
+
 }
