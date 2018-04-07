@@ -1,9 +1,9 @@
 package com.udacity.popularmovies;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -18,12 +18,8 @@ import android.widget.Toast;
 
 import com.udacity.popularmovies.Adapter.MovieAdapter;
 import com.udacity.popularmovies.Model.Movie;
-import com.udacity.popularmovies.Utils.Json;
 import com.udacity.popularmovies.Utils.Network;
 
-import org.json.JSONException;
-
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
@@ -73,7 +69,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     }
 
     private void drawMovies(){
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 4);
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+
         rv_movies.setLayoutManager(layoutManager);
         rv_movies.setHasFixedSize(true);
 

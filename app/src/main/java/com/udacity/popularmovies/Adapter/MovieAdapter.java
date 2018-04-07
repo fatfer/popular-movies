@@ -62,8 +62,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     public class MovieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-        @BindView(R.id.tv_title)
-        TextView tv_title;
         @BindView(R.id.iv_poster)
         ImageView iv_poster;
 
@@ -78,7 +76,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             Movie movie = mMovies.get(listIndex);
             String baseUrl = "http://image.tmdb.org/t/p/";
 
-            tv_title.setText(movie.getTitle());
             Picasso.get()
                     .load(baseUrl + "w342" + movie.getPosterPath())
                     .placeholder(R.mipmap.ic_launcher)

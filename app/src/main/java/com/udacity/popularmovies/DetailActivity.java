@@ -40,7 +40,8 @@ public class DetailActivity extends AppCompatActivity {
             closeOnError();
         }
 
-        Movie movie = (Movie) (intent != null ? intent.getSerializableExtra(EXTRA_MOVIE) : null);
+        Movie movie = (Movie) (intent != null ? intent.getExtras()
+                .getParcelable(EXTRA_MOVIE) : null);
 
         if (movie == null) {
             // Sandwich data unavailable

@@ -1,28 +1,30 @@
 package com.udacity.popularmovies.Model;
 
-import java.io.Serializable;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.ArrayList;
 import java.util.List;
 
-public class Movie implements Serializable {
+public class Movie implements Parcelable {
 
-    private String posterPath;
-    private boolean adult;
-    private String overview;
-    private String releaseDate;
-    private List genreIDs;
-    private String id;
-    private String originalTitle;
-    private String originalLanguage;
-    private String title;
-    private String backdropPath;
-    private int popularity;
-    private int voteCount;
-    private boolean video;
-    private int voteAverage;
-
+    String posterPath;
+    boolean adult;
+    String overview;
+    String releaseDate;
+    List<String> genreIDs;
+    String id;
+    String originalTitle;
+    String originalLanguage;
+    String title;
+    String backdropPath;
+    int popularity;
+    int voteCount;
+    boolean video;
+    int voteAverage;
 
     /**
-     * No args constructor for use in serialization
+     * No args constructor for use in serialization or in Parceler library
      */
     public Movie() {}
 
@@ -138,4 +140,57 @@ public class Movie implements Serializable {
     public void setVoteAverage(int voteAverage) {
         this.voteAverage = voteAverage;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(posterPath);
+        parcel.writeByte((byte) (adult ? 1 : 0));
+        parcel.writeString(overview);
+        parcel.writeString(releaseDate);
+        parcel.writeList(genreIDs);
+        parcel.writeString(id);
+        parcel.writeString(originalTitle);
+        parcel.writeString(originalLanguage);
+        parcel.writeString(title);
+        parcel.writeString(backdropPath);
+        parcel.writeInt(popularity);
+        parcel.writeInt(voteCount);
+        parcel.writeByte((byte) (video ? 1 : 0));
+        parcel.writeInt(voteAverage);
+    }
+
+    public static final Parcelable.Creator<Movie> CREATOR
+            = new Parcelable.Creator<Movie>() {
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
+
+    private Movie(Parcel in) {
+        posterPath = in.readString();
+        adult = in.readByte() != 0;
+        overview = in.readString();
+        releaseDate = in.readString();
+        genreIDs = new ArrayList<>();
+        in.readList(genreIDs, String.class.getClassLoader());
+        id = in.readString();
+        originalTitle = in.readString();
+        originalLanguage = in.readString();
+        title = in.readString();
+        backdropPath = in.readString();
+        popularity = in.readInt();
+        voteCount = in.readInt();
+        video = in.readByte() != 0;
+        voteAverage = in.readInt();
+    }
+
 }
