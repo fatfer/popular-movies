@@ -31,7 +31,6 @@ import static com.udacity.popularmovies.Utils.Network.isInternetAvailable;
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ListItemClickListener,AdapterView.OnItemSelectedListener {
 
     @BindView(R.id.rv_movies) RecyclerView rv_movies;
-    @BindView(R.id.spinner_order_by) Spinner spinner_order_by;
     @BindView(R.id.progressBar) ProgressBar progressBar;
     private List<Movie> mMovies;
 
@@ -41,12 +40,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.order_by_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner_order_by.setAdapter(adapter);
-        spinner_order_by.setOnItemSelectedListener(this);
-
+        showMostPopularFilms();
     }
 
     @Override
@@ -59,11 +53,22 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        /*if(id == R.id.action_settings){
-            Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
+
+        if (isInternetAvailable(this)) {
+            progressBar.setVisibility(View.VISIBLE);
+            if(id == R.id.action_most_popular){
+                showMostPopularFilms();
+            }
+            else if(id == R.id.action_highest_rated){
+                showHighestRatedFilms();
+            }
+            else if(id == R.id.action_favourites){
+                Toast.makeText(MainActivity.this, R.string.favourites, Toast.LENGTH_SHORT).show();
+            }
             return true;
-        }*/
+        }else{
+            Toast.makeText(MainActivity.this, R.string.get_data_from_api_error, Toast.LENGTH_SHORT).show();
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -98,18 +103,26 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         if (isInternetAvailable(this)) {
             progressBar.setVisibility(View.VISIBLE);
             if (value.equals(getString(R.string.most_popular))) {
-                URL popularMoviesUrl = Network.buildPopularMoviesUrl();
-                new TheMovieDBQueryTask(this, new TheMovieDBQueryTaskCompleteListener())
-                        .execute(popularMoviesUrl);
+                showMostPopularFilms();
             }
             else if (value.equals(getString(R.string.highest_rated))) {
-                URL highestRatedMoviesUrl = Network.buildHighestRatedMoviesUrl();
-                new TheMovieDBQueryTask(this, new TheMovieDBQueryTaskCompleteListener())
-                        .execute(highestRatedMoviesUrl);
+                showHighestRatedFilms();
             }
         }else{
             Toast.makeText(MainActivity.this, R.string.get_data_from_api_error, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void showMostPopularFilms() {
+        URL popularMoviesUrl = Network.buildPopularMoviesUrl();
+        new TheMovieDBQueryTask(this, new TheMovieDBQueryTaskCompleteListener())
+                .execute(popularMoviesUrl);
+    }
+
+    private void showHighestRatedFilms() {
+        URL highestRatedMoviesUrl = Network.buildHighestRatedMoviesUrl();
+        new TheMovieDBQueryTask(this, new TheMovieDBQueryTaskCompleteListener())
+                .execute(highestRatedMoviesUrl);
     }
 
     @Override

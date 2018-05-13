@@ -13,8 +13,5 @@
     <string name="most_popular">Most popular</string>
     <string name="highest_rated">Highest rated</string>
     <string name="get_data_from_api_error">No data available, check your connection.</string>
-    <string-array name="order_by_array">
-        <item>@string/most_popular</item>
-        <item>@string/highest_rated</item>
-    </string-array>
+    <string name="favourites">Favourites</string>
 </resources>
