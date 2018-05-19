@@ -4,15 +4,19 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.squareup.picasso.Picasso;
 import com.udacity.popularmovies.Model.Movie;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
+import butterknife.OnClick;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -23,6 +27,7 @@ public class DetailActivity extends AppCompatActivity {
     @BindView(R.id.tv_release_date) TextView tv_release_date;
     @BindView(R.id.tv_vote_average) TextView tv_vote_average;
     @BindView(R.id.iv_detail_poster) ImageView iv_detail_poster;
+    @BindView(R.id.tb_favourite) ToggleButton tb_favourite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +56,15 @@ public class DetailActivity extends AppCompatActivity {
 
         populateUI(movie);
 
+    }
+
+    @OnCheckedChanged(R.id.tb_favourite)
+    public void handleFavourite(ToggleButton button){
+        if(button.isChecked()) {
+            Toast.makeText(this,"Fav",Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(this,"No Fav",Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void populateUI(Movie movie) {
