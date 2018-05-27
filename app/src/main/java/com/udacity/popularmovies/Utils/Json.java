@@ -2,6 +2,7 @@ package com.udacity.popularmovies.Utils;
 
 import android.support.annotation.NonNull;
 import com.udacity.popularmovies.Model.Movie;
+import com.udacity.popularmovies.Model.Review;
 import com.udacity.popularmovies.Model.Trailer;
 
 import org.json.JSONArray;
@@ -35,6 +36,9 @@ public class Json {
     private static final String JSON_SIZE_KEY = "size";
     private static final String JSON_TYPE_KEY = "type";
 
+    private static final String JSON_AUTHOR = "author";
+    private static final String JSON_CONTENT = "content";
+
 
     public static List<Movie> parseMoviesJson(String json) throws JSONException {
         List<Movie> movies = new ArrayList<>();
@@ -62,6 +66,20 @@ public class Json {
         }
 
         return trailers;
+    }
+
+    public static List<Review> parseReviewsJson(String json) throws JSONException {
+        List<Review> reviews = new ArrayList<>();
+        JSONObject jsonObject = new JSONObject(json);
+        JSONArray results = jsonObject.getJSONArray(JSON_RESULTS_KEY);
+
+        for( int i = 0; i < results.length(); i++){
+            JSONObject result = results.getJSONObject(i);
+            Review review = getReview(result);
+            reviews.add(review);
+        }
+
+        return reviews;
     }
 
     @NonNull
@@ -100,6 +118,16 @@ public class Json {
         trailer.setType(result.getString(JSON_TYPE_KEY));
 
         return trailer;
+    }
+
+    @NonNull
+    private static Review getReview(JSONObject result) throws JSONException {
+        Review review = new Review();
+
+        review.setAuthor(result.optString(JSON_AUTHOR));
+        review.setContent(result.optString(JSON_CONTENT));
+
+        return review;
     }
 
     private static List<String> jsonArrayToList(JSONArray array) throws JSONException {

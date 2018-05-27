@@ -68,6 +68,23 @@ public class Network {
         return url;
     }
 
+    public static URL buildMovieReviewsUrl(String movieID) {
+        Uri builtUri = Uri.parse(THEMOVIEDB_BASE).buildUpon()
+                .appendPath(movieID)
+                .appendPath("reviews")
+                .appendQueryParameter(PARAM_API_KEY, BuildConfig.THE_MOVIE_DB_API_KEY)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return url;
+    }
+
     public static String getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try {

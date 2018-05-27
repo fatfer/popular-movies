@@ -19,8 +19,10 @@ import android.widget.ToggleButton;
 
 import com.squareup.picasso.Picasso;
 import com.udacity.popularmovies.Adapter.MovieAdapter;
+import com.udacity.popularmovies.Adapter.ReviewAdapter;
 import com.udacity.popularmovies.Adapter.TrailerAdapter;
 import com.udacity.popularmovies.Model.Movie;
+import com.udacity.popularmovies.Model.Review;
 import com.udacity.popularmovies.Model.Trailer;
 import com.udacity.popularmovies.Utils.Network;
 import com.udacity.popularmovies.Utils.Youtube;
@@ -34,7 +36,8 @@ import butterknife.OnCheckedChanged;
 
 import static com.udacity.popularmovies.Utils.Network.isInternetAvailable;
 
-public class DetailActivity extends AppCompatActivity implements MovieAdapter.ListItemClickListener,AdapterView.OnItemSelectedListener {
+public class DetailActivity extends AppCompatActivity implements TrailerAdapter.ListTrailerItemClickListener
+        ,ReviewAdapter.ListReviewItemClickListener, AdapterView.OnItemSelectedListener {
 
     public static final String TAG = DetailActivity.class.getSimpleName();
     public static final String EXTRA_MOVIE = "extra_movie";
@@ -45,7 +48,9 @@ public class DetailActivity extends AppCompatActivity implements MovieAdapter.Li
     @BindView(R.id.iv_detail_poster) ImageView iv_detail_poster;
     @BindView(R.id.tb_favourite) ToggleButton tb_favourite;
     @BindView(R.id.rv_trailers) RecyclerView rv_trailers;
+    @BindView(R.id.rv_reviews) RecyclerView rv_reviews;
     private List<Trailer> mTrailers;
+    private List<Review> mReviews;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,13 +72,13 @@ public class DetailActivity extends AppCompatActivity implements MovieAdapter.Li
                 .getParcelable(EXTRA_MOVIE) : null);
 
         if (movie == null) {
-            // Sandwich data unavailable
             closeOnError();
             return;
         }
 
         populateUI(movie);
         getTrailers(movie.getId());
+        getReviews(movie.getId());
     }
 
     @OnCheckedChanged(R.id.tb_favourite)
@@ -124,6 +129,25 @@ public class DetailActivity extends AppCompatActivity implements MovieAdapter.Li
         rv_trailers.setAdapter(adapter);
     }
 
+    private void getReviews(String id) {
+        URL movieTrailersUrl = Network.buildMovieReviewsUrl(id);
+        new TheMovieDBReviewQueryTask(this, new TheMovieDBReviewQueryTaskCompleteListener())
+                .execute(movieTrailersUrl);
+    }
+
+    private void drawReviews(){
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+
+        rv_reviews.setLayoutManager(layoutManager);
+        rv_reviews.setHasFixedSize(true);
+
+        ReviewAdapter adapter = new ReviewAdapter(mReviews, this);
+        rv_reviews.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+        rv_reviews.setAdapter(adapter);
+    }
+
+
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
         final String value = (String) adapterView.getItemAtPosition(position);
@@ -145,10 +169,17 @@ public class DetailActivity extends AppCompatActivity implements MovieAdapter.Li
 
     }
 
+
     @Override
-    public void onListItemClick(int clickedItemIndex) {
+    public void onListReviewItemClick(int clickedItemIndex) {
+
+    }
+
+    @Override
+    public void onListTrailerItemClick(int clickedItemIndex) {
         Youtube.watchYoutubeVideo(this,mTrailers.get(clickedItemIndex).getKey());
     }
+
 
     public class TheMovieDBTrailerQueryTaskCompleteListener implements AsyncTaskCompleteListener<List<Trailer>>
     {
@@ -157,6 +188,16 @@ public class DetailActivity extends AppCompatActivity implements MovieAdapter.Li
         public void onTaskComplete(List<Trailer> result) {
             mTrailers = result;
             drawTrailers();
+        }
+    }
+
+    public class TheMovieDBReviewQueryTaskCompleteListener implements AsyncTaskCompleteListener<List<Review>>
+    {
+
+        @Override
+        public void onTaskComplete(List<Review> result) {
+            mReviews = result;
+            drawReviews();
         }
     }
 

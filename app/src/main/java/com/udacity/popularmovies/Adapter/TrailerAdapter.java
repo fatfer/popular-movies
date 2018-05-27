@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.udacity.popularmovies.Model.Trailer;
@@ -22,13 +21,14 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
     private static final String TAG = TrailerAdapter.class.getSimpleName();
     private final int mNumberItems;
     private final List<Trailer> mTrailers;
-    final private MovieAdapter.ListItemClickListener mOnClickListener;
+    final private TrailerAdapter.ListTrailerItemClickListener mOnClickListener;
 
-    public TrailerAdapter(List<Trailer> trailers, MovieAdapter.ListItemClickListener mOnClickListener) {
+    public TrailerAdapter(List<Trailer> trailers, TrailerAdapter.ListTrailerItemClickListener mOnClickListener) {
         mTrailers = trailers;
         mNumberItems = trailers.size();
         this.mOnClickListener = mOnClickListener;
     }
+
 
     @NonNull
     @Override
@@ -54,6 +54,10 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
         return mNumberItems;
     }
 
+    public interface ListTrailerItemClickListener {
+        void onListTrailerItemClick(int clickedItemIndex);
+    }
+
     public class TrailerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         @BindView(R.id.tv_trailer_name)
@@ -74,7 +78,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
         @Override
         public void onClick(View v) {
             int clickedPosition = getAdapterPosition();
-            mOnClickListener.onListItemClick(clickedPosition);
+            mOnClickListener.onListTrailerItemClick(clickedPosition);
         }
     }
 }
