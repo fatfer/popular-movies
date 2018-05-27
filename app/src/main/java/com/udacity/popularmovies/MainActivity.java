@@ -11,9 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.udacity.popularmovies.Adapter.MovieAdapter;
@@ -40,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        showMostPopularFilms();
+        getMostPopularFilms();
     }
 
     @Override
@@ -57,10 +55,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         if (isInternetAvailable(this)) {
             progressBar.setVisibility(View.VISIBLE);
             if(id == R.id.action_most_popular){
-                showMostPopularFilms();
+                getMostPopularFilms();
             }
             else if(id == R.id.action_highest_rated){
-                showHighestRatedFilms();
+                getHighestRatedFilms();
             }
             else if(id == R.id.action_favourites){
                 Toast.makeText(MainActivity.this, R.string.favourites, Toast.LENGTH_SHORT).show();
@@ -95,31 +93,32 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         launchDetailActivity(clickedItemIndex);
     }
 
+    //TODO: Revisar para que se usa esto
     @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long l) {
+    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
 
-        final String value = (String) adapterView.getItemAtPosition(pos);
+        final String value = (String) adapterView.getItemAtPosition(position);
 
         if (isInternetAvailable(this)) {
             progressBar.setVisibility(View.VISIBLE);
             if (value.equals(getString(R.string.most_popular))) {
-                showMostPopularFilms();
+                getMostPopularFilms();
             }
             else if (value.equals(getString(R.string.highest_rated))) {
-                showHighestRatedFilms();
+                getHighestRatedFilms();
             }
         }else{
             Toast.makeText(MainActivity.this, R.string.get_data_from_api_error, Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void showMostPopularFilms() {
+    private void getMostPopularFilms() {
         URL popularMoviesUrl = Network.buildPopularMoviesUrl();
         new TheMovieDBQueryTask(this, new TheMovieDBQueryTaskCompleteListener())
                 .execute(popularMoviesUrl);
     }
 
-    private void showHighestRatedFilms() {
+    private void getHighestRatedFilms() {
         URL highestRatedMoviesUrl = Network.buildHighestRatedMoviesUrl();
         new TheMovieDBQueryTask(this, new TheMovieDBQueryTaskCompleteListener())
                 .execute(highestRatedMoviesUrl);

@@ -9,7 +9,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         tools:context="com.udacity.sandwichclub.DetailActivity">
 
         <ImageView
@@ -133,6 +133,20 @@
             app:layout_constraintHorizontal_bias="0.08"
             app:layout_constraintStart_toEndOf="@+id/iv_detail_poster"
             app:srcCompat="@drawable/ic_favorite_border_grey_24dp" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_trailers"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:scrollbars="none"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_release_date" />
 
     </android.support.constraint.ConstraintLayout>
 

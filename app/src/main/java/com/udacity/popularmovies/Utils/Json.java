@@ -2,6 +2,8 @@ package com.udacity.popularmovies.Utils;
 
 import android.support.annotation.NonNull;
 import com.udacity.popularmovies.Model.Movie;
+import com.udacity.popularmovies.Model.Trailer;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,6 +27,15 @@ public class Json {
     private static final String JSON_VIDEO_KEY = "video";
     private static final String JSON_VOTE_AVERAGE_KEY = "vote_average";
 
+    private static final String JSON_ISO_639_1_KEY = "iso_639_1";
+    private static final String JSON_ISO_3166_1 = "iso_3166_1";
+    private static final String JSON_KEY_KEY = "key";
+    private static final String JSON_NAME_KEY = "name";
+    private static final String JSON_SITE_KEY = "site";
+    private static final String JSON_SIZE_KEY = "size";
+    private static final String JSON_TYPE_KEY = "type";
+
+
     public static List<Movie> parseMoviesJson(String json) throws JSONException {
         List<Movie> movies = new ArrayList<>();
         JSONObject jsonObject = new JSONObject(json);
@@ -37,6 +48,20 @@ public class Json {
         }
 
         return movies;
+    }
+
+    public static List<Trailer> parseTrailersJson(String json) throws JSONException {
+        List<Trailer> trailers = new ArrayList<>();
+        JSONObject jsonObject = new JSONObject(json);
+        JSONArray results = jsonObject.getJSONArray(JSON_RESULTS_KEY);
+
+        for( int i = 0; i < results.length(); i++){
+            JSONObject result = results.getJSONObject(i);
+            Trailer trailer = getTrailer(result);
+            trailers.add(trailer);
+        }
+
+        return trailers;
     }
 
     @NonNull
@@ -59,6 +84,22 @@ public class Json {
         movie.setVoteAverage(result.getInt(JSON_VOTE_AVERAGE_KEY));
 
         return movie;
+    }
+
+    @NonNull
+    private static Trailer getTrailer(JSONObject result) throws JSONException {
+        Trailer trailer = new Trailer();
+
+        trailer.setId(result.optString(JSON_ID_KEY));
+        trailer.setIso_639_1(result.optString(JSON_ISO_639_1_KEY));
+        trailer.setIso_3166_1(result.optString(JSON_ISO_3166_1));
+        trailer.setKey(result.optString(JSON_KEY_KEY));
+        trailer.setName(result.optString(JSON_NAME_KEY));
+        trailer.setSite(result.optString(JSON_SITE_KEY));
+        trailer.setSize(result.optInt(JSON_SIZE_KEY));
+        trailer.setType(result.getString(JSON_TYPE_KEY));
+
+        return trailer;
     }
 
     private static List<String> jsonArrayToList(JSONArray array) throws JSONException {
