@@ -2,6 +2,7 @@ package com.udacity.popularmovies.Adapter;
 
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,6 +13,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+import com.udacity.popularmovies.Database.MovieContract;
+import com.udacity.popularmovies.Database.MovieDbHelper;
+import com.udacity.popularmovies.MainActivity;
 import com.udacity.popularmovies.Model.Movie;
 import com.udacity.popularmovies.R;
 
@@ -25,14 +29,20 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     private final int mNumberItems;
     private final List<Movie> mMovies;
     final private ListItemClickListener mOnClickListener;
+    private Cursor mCursor;
 
     public interface ListItemClickListener {
         void onListItemClick(int clickedItemIndex);
     }
 
-    public MovieAdapter(List<Movie> movies, ListItemClickListener mOnClickListener) {
+    public MovieAdapter(List<Movie> movies, Cursor cursor, ListItemClickListener mOnClickListener) {
+        int mNumberItems1;
         mMovies = movies;
-        mNumberItems = movies.size();
+        mNumberItems1 = 0;
+        if(cursor == null)
+            mNumberItems1 = movies.size();
+        mNumberItems = mNumberItems1;
+        mCursor = cursor;
         this.mOnClickListener = mOnClickListener;
     }
 
@@ -57,6 +67,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     @Override
     public int getItemCount() {
+        if(mCursor != null){
+            return mCursor.getCount();
+        }
         return mNumberItems;
     }
 
@@ -64,16 +77,31 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
         @BindView(R.id.iv_poster)
         ImageView iv_poster;
+        Context mContext;
 
         public MovieViewHolder(View itemView) {
             super(itemView);
 
+            mContext = itemView.getContext();
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
         }
 
         void bind(int listIndex) {
-            Movie movie = mMovies.get(listIndex);
+
+            Movie movie;
+            if(mCursor != null){
+                if (!mCursor.moveToPosition(listIndex))
+                    return;
+
+                movie = new Movie();
+                String posterPath = mCursor.getString(mCursor
+                        .getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_POSTER_PATH));
+                movie.setPosterPath(posterPath);
+            }else {
+                movie = mMovies.get(listIndex);
+            }
+
             String baseUrl = "http://image.tmdb.org/t/p/";
 
             Picasso.get()

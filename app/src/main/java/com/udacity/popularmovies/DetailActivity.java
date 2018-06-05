@@ -3,6 +3,7 @@ package com.udacity.popularmovies;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -21,6 +22,7 @@ import com.squareup.picasso.Picasso;
 import com.udacity.popularmovies.Adapter.MovieAdapter;
 import com.udacity.popularmovies.Adapter.ReviewAdapter;
 import com.udacity.popularmovies.Adapter.TrailerAdapter;
+import com.udacity.popularmovies.Database.MovieDbHelper;
 import com.udacity.popularmovies.Model.Movie;
 import com.udacity.popularmovies.Model.Review;
 import com.udacity.popularmovies.Model.Trailer;
@@ -37,10 +39,11 @@ import butterknife.OnCheckedChanged;
 import static com.udacity.popularmovies.Utils.Network.isInternetAvailable;
 
 public class DetailActivity extends AppCompatActivity implements TrailerAdapter.ListTrailerItemClickListener
-        ,ReviewAdapter.ListReviewItemClickListener, AdapterView.OnItemSelectedListener {
+        ,ReviewAdapter.ListReviewItemClickListener {
 
     public static final String TAG = DetailActivity.class.getSimpleName();
     public static final String EXTRA_MOVIE = "extra_movie";
+    public static final String EXTRA_IS_FAVOURITE = "extra_is_favourite";
     @BindView(R.id.tv_original_title) TextView tv_original_title;
     @BindView(R.id.tv_overview) TextView tv_overview;
     @BindView(R.id.tv_release_date) TextView tv_release_date;
@@ -51,6 +54,8 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     @BindView(R.id.rv_reviews) RecyclerView rv_reviews;
     private List<Trailer> mTrailers;
     private List<Review> mReviews;
+    private Movie mMovie;
+    private boolean isFavourite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,22 +76,37 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         Movie movie = (Movie) (intent != null ? intent.getExtras()
                 .getParcelable(EXTRA_MOVIE) : null);
 
+         isFavourite = intent.getBooleanExtra(EXTRA_IS_FAVOURITE, false);
+
         if (movie == null) {
             closeOnError();
             return;
         }
 
+        mMovie = movie;
         populateUI(movie);
         getTrailers(movie.getId());
         getReviews(movie.getId());
+
+        tb_favourite.setChecked(isFavourite);
     }
 
     @OnCheckedChanged(R.id.tb_favourite)
     public void handleFavourite(ToggleButton button){
         if(button.isChecked()) {
-            Toast.makeText(this,"Fav",Toast.LENGTH_SHORT).show();
-        }else{
-            Toast.makeText(this,"No Fav",Toast.LENGTH_SHORT).show();
+            if(isFavourite == false) {
+                Toast.makeText(this, "Added to favourites", Toast.LENGTH_SHORT).show();
+                isFavourite = true;
+            }
+            MovieDbHelper movieDbHelper = new MovieDbHelper(getBaseContext());
+            movieDbHelper.addMovie(mMovie);
+        }else {
+            MovieDbHelper movieDbHelper = new MovieDbHelper(getBaseContext());
+            movieDbHelper.deleteMovie(mMovie);
+            if (isFavourite) {
+                Toast.makeText(this, "Removed from favourites", Toast.LENGTH_SHORT).show();
+                isFavourite = false;
+            }
         }
     }
 
@@ -146,29 +166,6 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         rv_reviews.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         rv_reviews.setAdapter(adapter);
     }
-
-
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-        final String value = (String) adapterView.getItemAtPosition(position);
-
-        if (isInternetAvailable(this)) {
-            if (value.equals(getString(R.string.most_popular))) {
-
-            }
-            else if (value.equals(getString(R.string.highest_rated))) {
-
-            }
-        }else{
-            Toast.makeText(DetailActivity.this, R.string.get_data_from_api_error, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
-
 
     @Override
     public void onListReviewItemClick(int clickedItemIndex) {

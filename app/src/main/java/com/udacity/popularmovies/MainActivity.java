@@ -1,6 +1,8 @@
 package com.udacity.popularmovies;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -14,7 +16,10 @@ import android.widget.AdapterView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.facebook.stetho.Stetho;
 import com.udacity.popularmovies.Adapter.MovieAdapter;
+import com.udacity.popularmovies.Database.MovieContract;
+import com.udacity.popularmovies.Database.MovieDbHelper;
 import com.udacity.popularmovies.Model.Movie;
 import com.udacity.popularmovies.Utils.Network;
 
@@ -26,11 +31,21 @@ import butterknife.ButterKnife;
 
 import static com.udacity.popularmovies.Utils.Network.isInternetAvailable;
 
-public class MainActivity extends AppCompatActivity implements MovieAdapter.ListItemClickListener,AdapterView.OnItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements MovieAdapter.ListItemClickListener {
 
     @BindView(R.id.rv_movies) RecyclerView rv_movies;
     @BindView(R.id.progressBar) ProgressBar progressBar;
     private List<Movie> mMovies;
+    private Cursor mFavouritesCursor;
+    private SQLiteDatabase mDb;
+    public static final String CURRENT_LIST_TYPE = "current_list_type";
+    public enum currentListType {
+        POPULAR,
+        HIGHEST_RATED,
+        FAVOURITES
+    }
+    public int mCurrentListType;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +53,22 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        getMostPopularFilms();
+        Stetho.initializeWithDefaults(this);
+
+        if (savedInstanceState != null) {
+            int savedListType = savedInstanceState.getInt(CURRENT_LIST_TYPE);
+            Toast.makeText(this, savedListType+"", Toast.LENGTH_LONG).show();
+
+            if(savedListType == currentListType.POPULAR.ordinal()){
+                getMostPopularFilms();
+            }else if(savedListType == currentListType.HIGHEST_RATED.ordinal()){
+                getHighestRatedFilms();
+            }else if(savedListType == currentListType.FAVOURITES.ordinal()){
+                getFavouriteFilms();
+            }
+        }else{
+            getMostPopularFilms();
+        }
     }
 
     @Override
@@ -52,16 +82,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (isInternetAvailable(this)) {
+        if(id == R.id.action_favourites){
+            mMovies = null;
+            getFavouriteFilms();
+            return true;
+        } else if (isInternetAvailable(this)) {
             progressBar.setVisibility(View.VISIBLE);
             if(id == R.id.action_most_popular){
                 getMostPopularFilms();
             }
             else if(id == R.id.action_highest_rated){
                 getHighestRatedFilms();
-            }
-            else if(id == R.id.action_favourites){
-                Toast.makeText(MainActivity.this, R.string.favourites, Toast.LENGTH_SHORT).show();
             }
             return true;
         }else{
@@ -71,20 +102,56 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         return super.onOptionsItemSelected(item);
     }
 
-    private void drawMovies(){
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putInt(CURRENT_LIST_TYPE, mCurrentListType);
+        super.onSaveInstanceState(outState);
+    }
+
+    private Cursor getAllFavouriteMovies() {
+
+        return mDb.query(
+                MovieContract.MovieEntry.TABLE_NAME,
+                null,
+                null,
+                null,
+                null,
+                null,
+                MovieContract.MovieEntry.COLUMN_NAME_TITLE
+        );
+    }
+    private void drawMovies(Cursor cursor){
         GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 4);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
         rv_movies.setLayoutManager(layoutManager);
         rv_movies.setHasFixedSize(true);
 
-        MovieAdapter adapter = new MovieAdapter(mMovies, this);
+        MovieAdapter adapter = new MovieAdapter(mMovies, cursor, this);
         rv_movies.setAdapter(adapter);
     }
 
     private void launchDetailActivity(int position) {
         Intent intent = new Intent(this, DetailActivity.class);
-        intent.putExtra(DetailActivity.EXTRA_MOVIE, mMovies.get(position));
+        MovieDbHelper dbHelper = new MovieDbHelper(this);
+        Movie movie;
+        if(mFavouritesCursor != null && mFavouritesCursor.moveToFirst()){
+            mFavouritesCursor.moveToPosition(position);
+            movie = dbHelper.getMovie(mFavouritesCursor);
+            mMovies = null;
+        }else{
+            movie = mMovies.get(position);
+            mFavouritesCursor = null;
+        }
+
+        intent.putExtra(DetailActivity.EXTRA_MOVIE, movie);
+
+        boolean isFavourite = false;
+        if(dbHelper.getMovie(movie.getId()) != null) {
+            isFavourite = true;
+        }
+
+        intent.putExtra(DetailActivity.EXTRA_IS_FAVOURITE, isFavourite);
+
         startActivity(intent);
     }
 
@@ -93,41 +160,31 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         launchDetailActivity(clickedItemIndex);
     }
 
-    //TODO: Revisar para que se usa esto
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-
-        final String value = (String) adapterView.getItemAtPosition(position);
-
-        if (isInternetAvailable(this)) {
-            progressBar.setVisibility(View.VISIBLE);
-            if (value.equals(getString(R.string.most_popular))) {
-                getMostPopularFilms();
-            }
-            else if (value.equals(getString(R.string.highest_rated))) {
-                getHighestRatedFilms();
-            }
-        }else{
-            Toast.makeText(MainActivity.this, R.string.get_data_from_api_error, Toast.LENGTH_SHORT).show();
-        }
-    }
 
     private void getMostPopularFilms() {
         URL popularMoviesUrl = Network.buildPopularMoviesUrl();
         new TheMovieDBQueryTask(this, new TheMovieDBQueryTaskCompleteListener())
                 .execute(popularMoviesUrl);
+        mCurrentListType = currentListType.POPULAR.ordinal();
     }
 
     private void getHighestRatedFilms() {
         URL highestRatedMoviesUrl = Network.buildHighestRatedMoviesUrl();
         new TheMovieDBQueryTask(this, new TheMovieDBQueryTaskCompleteListener())
                 .execute(highestRatedMoviesUrl);
+        mCurrentListType = currentListType.HIGHEST_RATED.ordinal();
     }
 
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-
+    private void getFavouriteFilms() {
+        MovieDbHelper dbHelper = new MovieDbHelper(this);
+        mDb = dbHelper.getWritableDatabase();
+        Cursor cursor = getAllFavouriteMovies();
+        mFavouritesCursor = cursor;
+        drawMovies(cursor);
+        progressBar.setVisibility(View.INVISIBLE);
+        mCurrentListType = currentListType.FAVOURITES.ordinal();
     }
+
 
     public class TheMovieDBQueryTaskCompleteListener implements AsyncTaskCompleteListener<List<Movie>>
     {
@@ -136,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         public void onTaskComplete(List<Movie> result) {
             progressBar.setVisibility(View.INVISIBLE);
             mMovies = result;
-            drawMovies();
+            drawMovies(null);
         }
     }
 
