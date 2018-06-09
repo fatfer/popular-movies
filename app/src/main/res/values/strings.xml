@@ -15,4 +15,7 @@
     <string name="get_data_from_api_error">No data available, check your connection.</string>
     <string name="favourites">Favourites</string>
     <string name="video">video</string>
+    <string name="highest_rated_films">Highest Rated Films</string>
+    <string name="most_popular_films">Most Popular Films</string>
+    <string name="favourite_films">Favourite Films</string>
 </resources>

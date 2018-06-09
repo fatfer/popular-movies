@@ -57,7 +57,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
         if (savedInstanceState != null) {
             int savedListType = savedInstanceState.getInt(CURRENT_LIST_TYPE);
-            Toast.makeText(this, savedListType+"", Toast.LENGTH_LONG).show();
 
             if(savedListType == currentListType.POPULAR.ordinal()){
                 getMostPopularFilms();
@@ -162,6 +161,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
 
     private void getMostPopularFilms() {
+        getSupportActionBar().setTitle(R.string.most_popular_films);
         URL popularMoviesUrl = Network.buildPopularMoviesUrl();
         new TheMovieDBQueryTask(this, new TheMovieDBQueryTaskCompleteListener())
                 .execute(popularMoviesUrl);
@@ -169,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     }
 
     private void getHighestRatedFilms() {
+        getSupportActionBar().setTitle(R.string.highest_rated_films);
         URL highestRatedMoviesUrl = Network.buildHighestRatedMoviesUrl();
         new TheMovieDBQueryTask(this, new TheMovieDBQueryTaskCompleteListener())
                 .execute(highestRatedMoviesUrl);
@@ -176,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     }
 
     private void getFavouriteFilms() {
+        getSupportActionBar().setTitle(R.string.favourite_films);
         MovieDbHelper dbHelper = new MovieDbHelper(this);
         mDb = dbHelper.getWritableDatabase();
         Cursor cursor = getAllFavouriteMovies();
@@ -194,6 +196,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             progressBar.setVisibility(View.INVISIBLE);
             mMovies = result;
             drawMovies(null);
+            mFavouritesCursor = null;
         }
     }
 

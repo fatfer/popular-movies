@@ -95,7 +95,7 @@ public class MovieDbHelper extends SQLiteOpenHelper{
             movie = getMovie(cursor);
             cursor.close();
         }
-
+        db.close();
         return movie;
     }
 
@@ -125,7 +125,8 @@ public class MovieDbHelper extends SQLiteOpenHelper{
                 movies.add(movie);
             } while (cursor.moveToNext());
         }
-
+        cursor.close();
+        db.close();
         return movies;
     }
 
