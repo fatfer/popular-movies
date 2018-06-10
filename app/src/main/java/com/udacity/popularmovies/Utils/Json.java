@@ -88,14 +88,14 @@ public class Json {
 
         movie.setPosterPath(result.optString(JSON_POSTER_PATH_KEY));
         movie.setAdult(result.getBoolean(JSON_ADULT_KEY));
-        movie.setOverview(result.getString(JSON_OVERVIEW_KEY));
-        movie.setReleaseDate(result.getString(JSON_RELEASE_DATE_KEY));
+        movie.setOverview(result.optString(JSON_OVERVIEW_KEY));
+        movie.setReleaseDate(result.optString(JSON_RELEASE_DATE_KEY));
         movie.setGenreIDs(jsonArrayToList(result.getJSONArray(JSON_GENRE_IDS_KEY)));
-        movie.setId(result.getString(JSON_ID_KEY));
-        movie.setOriginalTitle(result.getString(JSON_ORIGINAL_TITLE_KEY));
+        movie.setId(result.optString(JSON_ID_KEY));
+        movie.setOriginalTitle(result.optString(JSON_ORIGINAL_TITLE_KEY));
         movie.setOriginalLanguage(result.getString(JSON_ORIGINAL_LANGUAGE_KEY));
-        movie.setTitle(result.getString(JSON_TITLE_KEY));
-        movie.setBackdropPath(result.getString(JSON_BACKDROP_PATH_KEY));
+        movie.setTitle(result.optString(JSON_TITLE_KEY));
+        movie.setBackdropPath(result.optString(JSON_BACKDROP_PATH_KEY));
         movie.setPopularity(result.getInt(JSON_POPULARITY_KEY));
         movie.setVoteCount(result.getInt(JSON_VOTE_COUNT_KEY));
         movie.setVideo(result.getBoolean(JSON_VIDEO_KEY));
