@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.support.annotation.NonNull;
 
 import com.udacity.popularmovies.Database.MovieContract.*;
@@ -50,88 +51,50 @@ public class MovieDbHelper extends SQLiteOpenHelper{
     }
 
 
-    public void addMovie(Movie movie){
+    public long addMovie(ContentValues values){
+
+        return getWritableDatabase().insert(MovieEntry.TABLE_NAME, "", values);
+    }
+
+    public int deleteMovie(String id) {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
-        ContentValues values = new ContentValues();
-        values.put(MovieEntry._ID, movie.getId());
-        values.put(MovieEntry.COLUMN_NAME_POSTER_PATH, movie.getPosterPath());
-        values.put(MovieEntry.COLUMN_NAME_TITLE, movie.getTitle());
-        values.put(MovieEntry.COLUMN_NAME_ADULT, movie.isAdult());
-        values.put(MovieEntry.COLUMN_NAME_OVERVIEW, movie.getOverview());
-        values.put(MovieEntry.COLUMN_NAME_RELEASE_DATE, movie.getReleaseDate());
-        values.put(MovieEntry.COLUMN_NAME_ORIGINAL_TITLE, movie.getOriginalTitle());
-        values.put(MovieEntry.COLUMN_NAME_ORIGINAL_LANGUAGE, movie.getOriginalLanguage());
-        values.put(MovieEntry.COLUMN_NAME_BACKDROP_PATH, movie.getBackdropPath());
-        values.put(MovieEntry.COLUMN_NAME_POPULARITY, movie.getPopularity());
-        values.put(MovieEntry.COLUMN_NAME_VOTE_COUNT,movie.getVoteCount());
-        values.put(MovieEntry.COLUMN_NAME_VIDEO, movie.isVideo());
-        values.put(MovieEntry.COLUMN_NAME_VOTE_AVERAGE, movie.getVoteAverage());
+        return db.delete(MovieEntry.TABLE_NAME,
+                MovieEntry._ID + " = ?",
+                new String[] {id});
 
-        db.insert(MovieEntry.TABLE_NAME,
+    }
+
+    public int updateMovie(String id, ContentValues values){
+        return getWritableDatabase().update(MovieEntry.TABLE_NAME, values,
+                MovieEntry._ID + " = ?",
+                new String[]{id});
+    }
+
+    public Cursor getMovies(String id, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
+        sqliteQueryBuilder.setTables(MovieEntry.TABLE_NAME);
+
+        if(id != null) {
+            sqliteQueryBuilder.appendWhere("_id" + " = " + id);
+        }
+
+        if(sortOrder == null || sortOrder == "") {
+            sortOrder = MovieEntry._ID;
+        }
+        Cursor cursor = sqliteQueryBuilder.query(getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
                 null,
-                values);
-
-        db.close();
-    }
-
-    public Movie getMovie(String id){
-
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        Cursor cursor =
-                db.query(MovieEntry.TABLE_NAME, // a. table
-                        null, // b. column names
-                        " _ID = ?", // c. selections
-                        new String[] {id}, // d. selections args
-                        null, // e. group by
-                        null, // f. having
-                        null, // g. order by
-                        null); // h. limit
-
-        Movie movie = null;
-        if( cursor != null && cursor.moveToFirst() ){
-            movie = getMovie(cursor);
-            cursor.close();
-        }
-        db.close();
-        return movie;
-    }
-
-    public void deleteMovie(Movie movie) {
-
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        db.delete(MovieEntry.TABLE_NAME,
-                MovieEntry._ID+" = ?",
-                new String[] { String.valueOf(movie.getId()) });
-
-        db.close();
-    }
-
-    public List<Movie> getAllMovies() {
-        List<Movie> movies = new LinkedList<>();
-
-        String query = "SELECT  * FROM " + MovieEntry.TABLE_NAME;
-
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
-
-        Movie movie;
-        if (cursor.moveToFirst()) {
-            do {
-                movie = getMovie(cursor);
-                movies.add(movie);
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
-        db.close();
-        return movies;
+                null,
+                sortOrder);
+        return cursor;
     }
 
     @NonNull
-    public Movie getMovie(Cursor cursor) {
+    public Movie getMovieByCursor(Cursor cursor) {
         Movie movie;
         movie = new Movie();
         movie.setId(cursor.getString(cursor.getColumnIndex(MovieEntry._ID)));

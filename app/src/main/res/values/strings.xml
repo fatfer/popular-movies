@@ -18,4 +18,7 @@
     <string name="highest_rated_films">Highest Rated Films</string>
     <string name="most_popular_films">Most Popular Films</string>
     <string name="favourite_films">Favourite Films</string>
+    <string name="added_to_favourites">Added to favourites</string>
+    <string name="removed_from_favourites">Removed from favourites</string>
+
 </resources>

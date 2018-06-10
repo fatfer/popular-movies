@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 
 import com.facebook.stetho.Stetho;
 import com.udacity.popularmovies.Adapter.MovieAdapter;
+import com.udacity.popularmovies.ContentProvider.MovieProvider;
 import com.udacity.popularmovies.Database.MovieContract;
 import com.udacity.popularmovies.Database.MovieDbHelper;
 import com.udacity.popularmovies.Model.Movie;
@@ -108,16 +110,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     private Cursor getAllFavouriteMovies() {
 
-        return mDb.query(
-                MovieContract.MovieEntry.TABLE_NAME,
-                null,
-                null,
-                null,
-                null,
-                null,
-                MovieContract.MovieEntry.COLUMN_NAME_TITLE
-        );
+        CursorLoader cursorLoader = new CursorLoader(getBaseContext(), MovieProvider.CONTENT_URI,
+                null, null, null, null);
+        Cursor cursor = cursorLoader.loadInBackground();
+        return cursor;
     }
+
     private void drawMovies(Cursor cursor){
         GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 4);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -135,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         Movie movie;
         if(mFavouritesCursor != null && mFavouritesCursor.moveToFirst()){
             mFavouritesCursor.moveToPosition(position);
-            movie = dbHelper.getMovie(mFavouritesCursor);
+            movie = dbHelper.getMovieByCursor(mFavouritesCursor);
             mMovies = null;
         }else{
             movie = mMovies.get(position);
@@ -145,7 +143,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         intent.putExtra(DetailActivity.EXTRA_MOVIE, movie);
 
         boolean isFavourite = false;
-        if(dbHelper.getMovie(movie.getId()) != null) {
+
+        CursorLoader cursorMovie= new CursorLoader(getBaseContext(), MovieProvider.CONTENT_URI.buildUpon()
+                .appendPath(movie.getId()).build(),null, null, null, null);
+        Cursor cursor = cursorMovie.loadInBackground();
+
+        if(cursor.getCount() == 1) {
             isFavourite = true;
         }
 

@@ -1,11 +1,13 @@
 package com.udacity.popularmovies;
 
 import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -22,6 +24,8 @@ import com.squareup.picasso.Picasso;
 import com.udacity.popularmovies.Adapter.MovieAdapter;
 import com.udacity.popularmovies.Adapter.ReviewAdapter;
 import com.udacity.popularmovies.Adapter.TrailerAdapter;
+import com.udacity.popularmovies.ContentProvider.MovieProvider;
+import com.udacity.popularmovies.Database.MovieContract;
 import com.udacity.popularmovies.Database.MovieDbHelper;
 import com.udacity.popularmovies.Model.Movie;
 import com.udacity.popularmovies.Model.Review;
@@ -94,20 +98,59 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     @OnCheckedChanged(R.id.tb_favourite)
     public void handleFavourite(ToggleButton button){
         if(button.isChecked()) {
-            if(isFavourite == false) {
-                Toast.makeText(this, "Added to favourites", Toast.LENGTH_SHORT).show();
-                isFavourite = true;
+            if(isFavourite){
+                updateFavourite();
+            }else {
+                saveToFavourites();
+                Toast.makeText(this, R.string.added_to_favourites, Toast.LENGTH_SHORT).show();
             }
-            MovieDbHelper movieDbHelper = new MovieDbHelper(getBaseContext());
-            movieDbHelper.addMovie(mMovie);
         }else {
-            MovieDbHelper movieDbHelper = new MovieDbHelper(getBaseContext());
-            movieDbHelper.deleteMovie(mMovie);
-            if (isFavourite) {
-                Toast.makeText(this, "Removed from favourites", Toast.LENGTH_SHORT).show();
-                isFavourite = false;
-            }
+            deleteFromFavourites();
+            Toast.makeText(this, R.string.removed_from_favourites, Toast.LENGTH_SHORT).show();
+            isFavourite = false;
         }
+    }
+
+    private void updateFavourite(){
+        ContentValues values = getContentValues();
+
+        getContentResolver().update(
+                MovieProvider.CONTENT_URI.buildUpon()
+                        .appendPath(mMovie.getId()).build(), values,null,null);
+    }
+
+    private void saveToFavourites(){
+
+        ContentValues values = getContentValues();
+
+        getContentResolver().insert(
+                MovieProvider.CONTENT_URI, values);
+    }
+
+    @NonNull
+    private ContentValues getContentValues() {
+        ContentValues values = new ContentValues();
+        values.put(MovieContract.MovieEntry._ID, mMovie.getId());
+        values.put(MovieContract.MovieEntry.COLUMN_NAME_POSTER_PATH, mMovie.getPosterPath());
+        values.put(MovieContract.MovieEntry.COLUMN_NAME_TITLE, mMovie.getTitle());
+        values.put(MovieContract.MovieEntry.COLUMN_NAME_ADULT, mMovie.isAdult());
+        values.put(MovieContract.MovieEntry.COLUMN_NAME_OVERVIEW, mMovie.getOverview());
+        values.put(MovieContract.MovieEntry.COLUMN_NAME_RELEASE_DATE, mMovie.getReleaseDate());
+        values.put(MovieContract.MovieEntry.COLUMN_NAME_ORIGINAL_TITLE, mMovie.getOriginalTitle());
+        values.put(MovieContract.MovieEntry.COLUMN_NAME_ORIGINAL_LANGUAGE, mMovie.getOriginalLanguage());
+        values.put(MovieContract.MovieEntry.COLUMN_NAME_BACKDROP_PATH, mMovie.getBackdropPath());
+        values.put(MovieContract.MovieEntry.COLUMN_NAME_POPULARITY, mMovie.getPopularity());
+        values.put(MovieContract.MovieEntry.COLUMN_NAME_VOTE_COUNT, mMovie.getVoteCount());
+        values.put(MovieContract.MovieEntry.COLUMN_NAME_VIDEO, mMovie.isVideo());
+        values.put(MovieContract.MovieEntry.COLUMN_NAME_VOTE_AVERAGE, mMovie.getVoteAverage());
+        return values;
+    }
+
+    private void deleteFromFavourites(){
+
+        getContentResolver().delete(MovieProvider.CONTENT_URI.buildUpon().appendPath(mMovie.getId()).build() ,
+                null, null);
+
     }
 
     private void populateUI(Movie movie) {

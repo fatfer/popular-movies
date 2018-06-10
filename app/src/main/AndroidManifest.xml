@@ -23,6 +23,9 @@
             android:name=".DetailActivity"
             android:label="@string/title_activity_detail"
             android:parentActivityName=".MainActivity" />
+        <provider android:name="com.udacity.popularmovies.ContentProvider.MovieProvider"
+            android:authorities="com.udacity.popularmovies.ContentProvider"
+            android:exported="false"/>
     </application>
 
 </manifest>
