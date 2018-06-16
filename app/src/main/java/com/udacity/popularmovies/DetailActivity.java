@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -105,8 +106,12 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             if(mIsFavourite){
                 updateFavourite();
             }else {
-                saveToFavourites();
-                Toast.makeText(this, R.string.added_to_favourites, Toast.LENGTH_SHORT).show();
+                try {
+                    saveToFavourites();
+                    Toast.makeText(this, R.string.added_to_favourites, Toast.LENGTH_SHORT).show();
+                }catch(Exception e){
+                    Log.e(TAG, "Exception saving to favourites", e);
+                }
             }
         }else {
             deleteFromFavourites();
