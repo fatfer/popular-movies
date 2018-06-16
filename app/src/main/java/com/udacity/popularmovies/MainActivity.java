@@ -2,25 +2,25 @@ package com.udacity.popularmovies;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.facebook.stetho.Stetho;
 import com.udacity.popularmovies.Adapter.MovieAdapter;
 import com.udacity.popularmovies.ContentProvider.MovieProvider;
-import com.udacity.popularmovies.Database.MovieContract;
 import com.udacity.popularmovies.Database.MovieDbHelper;
 import com.udacity.popularmovies.Model.Movie;
 import com.udacity.popularmovies.Utils.Network;
@@ -35,18 +35,22 @@ import static com.udacity.popularmovies.Utils.Network.isInternetAvailable;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ListItemClickListener {
 
-    @BindView(R.id.rv_movies) RecyclerView rv_movies;
-    @BindView(R.id.progressBar) ProgressBar progressBar;
+    @BindView(R.id.rv_movies)
+     RecyclerView rv_movies;
+    @BindView(R.id.progressBar)
+     ProgressBar progressBar;
     private List<Movie> mMovies;
     private Cursor mFavouritesCursor;
-    private SQLiteDatabase mDb;
-    public static final String CURRENT_LIST_TYPE = "current_list_type";
+    private static final String CURRENT_LIST_TYPE = "current_list_type";
+    private final String KEY_RECYCLER_STATE = "recycler_state";
+    private static Bundle mBundleRecyclerViewState;
     public enum currentListType {
         POPULAR,
         HIGHEST_RATED,
         FAVOURITES
     }
-    public int mCurrentListType;
+    private int mCurrentListType;
+    private GridLayoutManager mLayoutManager;
 
 
     @Override
@@ -60,16 +64,30 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         if (savedInstanceState != null) {
             int savedListType = savedInstanceState.getInt(CURRENT_LIST_TYPE);
 
-            if(savedListType == currentListType.POPULAR.ordinal()){
-                getMostPopularFilms();
-            }else if(savedListType == currentListType.HIGHEST_RATED.ordinal()){
-                getHighestRatedFilms();
-            }else if(savedListType == currentListType.FAVOURITES.ordinal()){
-                getFavouriteFilms();
-            }
+            loadSavedListTypeMovies(savedListType);
         }else{
             getMostPopularFilms();
         }
+
+    }
+
+    private void loadSavedListTypeMovies(int savedListType) {
+        if(savedListType == currentListType.POPULAR.ordinal()){
+            getMostPopularFilms();
+        }else if(savedListType == currentListType.HIGHEST_RATED.ordinal()){
+            getHighestRatedFilms();
+        }else if(savedListType == currentListType.FAVOURITES.ordinal()){
+            getFavouriteFilms();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        mBundleRecyclerViewState = new Bundle();
+        Parcelable listState = rv_movies.getLayoutManager().onSaveInstanceState();
+        mBundleRecyclerViewState.putParcelable(KEY_RECYCLER_STATE, listState);
     }
 
     @Override
@@ -77,6 +95,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
         return true;
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        loadSavedListTypeMovies(mCurrentListType);
     }
 
     @Override
@@ -105,26 +129,46 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     public void onSaveInstanceState(Bundle outState) {
         outState.putInt(CURRENT_LIST_TYPE, mCurrentListType);
+
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
     }
 
     private Cursor getAllFavouriteMovies() {
 
         CursorLoader cursorLoader = new CursorLoader(getBaseContext(), MovieProvider.CONTENT_URI,
                 null, null, null, null);
-        Cursor cursor = cursorLoader.loadInBackground();
-        return cursor;
+        return cursorLoader.loadInBackground();
     }
 
     private void drawMovies(Cursor cursor){
-        GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 4);
-        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        int posterWidth = 250;
+        mLayoutManager = new GridLayoutManager(getApplicationContext(), calculateBestSpanCount(posterWidth));
+        mLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
-        rv_movies.setLayoutManager(layoutManager);
+        rv_movies.setLayoutManager(mLayoutManager);
         rv_movies.setHasFixedSize(true);
+
+        if (mBundleRecyclerViewState != null) {
+            Parcelable listState = mBundleRecyclerViewState.getParcelable(KEY_RECYCLER_STATE);
+            RecyclerView.LayoutManager layout = rv_movies.getLayoutManager();
+            layout.onRestoreInstanceState(listState);
+        }
 
         MovieAdapter adapter = new MovieAdapter(mMovies, cursor, this);
         rv_movies.setAdapter(adapter);
+    }
+
+    private int calculateBestSpanCount(int posterWidth) {
+        Display display = getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
+        float screenWidth = outMetrics.widthPixels;
+        return Math.round(screenWidth / posterWidth);
     }
 
     private void launchDetailActivity(int position) {
@@ -181,8 +225,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     private void getFavouriteFilms() {
         getSupportActionBar().setTitle(R.string.favourite_films);
-        MovieDbHelper dbHelper = new MovieDbHelper(this);
-        mDb = dbHelper.getWritableDatabase();
         Cursor cursor = getAllFavouriteMovies();
         mFavouritesCursor = cursor;
         drawMovies(cursor);

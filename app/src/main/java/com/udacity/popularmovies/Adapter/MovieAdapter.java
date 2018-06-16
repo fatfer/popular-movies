@@ -5,17 +5,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.udacity.popularmovies.Database.MovieContract;
-import com.udacity.popularmovies.Database.MovieDbHelper;
-import com.udacity.popularmovies.MainActivity;
 import com.udacity.popularmovies.Model.Movie;
 import com.udacity.popularmovies.R;
 
@@ -29,7 +25,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     private final int mNumberItems;
     private final List<Movie> mMovies;
     final private ListItemClickListener mOnClickListener;
-    private Cursor mCursor;
+    private final Cursor mCursor;
 
     public interface ListItemClickListener {
         void onListItemClick(int clickedItemIndex);
@@ -76,9 +72,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
         @BindView(R.id.iv_poster)
         ImageView iv_poster;
-        Context mContext;
+        final Context mContext;
 
-        public MovieViewHolder(View itemView) {
+        MovieViewHolder(View itemView) {
             super(itemView);
 
             mContext = itemView.getContext();
@@ -96,7 +92,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
                 movie = new Movie();
                 String posterPath = mCursor.getString(mCursor
                         .getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_POSTER_PATH));
-                movie.setPosterPath(posterPath);
+                movie.setmPosterPath(posterPath);
             }else {
                 movie = mMovies.get(listIndex);
             }
@@ -104,7 +100,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             String baseUrl = "http://image.tmdb.org/t/p/";
 
             Picasso.get()
-                    .load(baseUrl + "w342" + movie.getPosterPath())
+                    .load(baseUrl + "w342" + movie.getmPosterPath())
                     .placeholder(R.mipmap.ic_launcher)
                     .error(R.mipmap.ic_launcher)
                     .into(iv_poster);

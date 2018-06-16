@@ -3,7 +3,6 @@ package com.udacity.popularmovies;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.view.View;
 import android.widget.Toast;
 
 import com.udacity.popularmovies.Model.Movie;
@@ -16,21 +15,16 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
-public class TheMovieDBQueryTask extends AsyncTask<URL, Void, String> {
+class TheMovieDBQueryTask extends AsyncTask<URL, Void, String> {
 
     private static final String TAG = TheMovieDBQueryTask.class.getSimpleName();
-    private Context context;
-    private AsyncTaskCompleteListener<List<Movie>> listener;
+    private final Context context;
+    private final AsyncTaskCompleteListener<List<Movie>> listener;
 
     public TheMovieDBQueryTask(Context context, AsyncTaskCompleteListener<List<Movie>> listener)
     {
         this.context = context;
         this.listener = listener;
-    }
-
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
     }
 
     @Override

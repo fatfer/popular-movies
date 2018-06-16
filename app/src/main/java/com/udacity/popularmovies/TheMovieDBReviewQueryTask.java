@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import com.udacity.popularmovies.Model.Review;
-import com.udacity.popularmovies.Model.Trailer;
 import com.udacity.popularmovies.Utils.Json;
 import com.udacity.popularmovies.Utils.Network;
 
@@ -15,22 +14,17 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
-public class TheMovieDBReviewQueryTask extends AsyncTask<URL, Void, String>
+class TheMovieDBReviewQueryTask extends AsyncTask<URL, Void, String>
     {
 
         private static final String TAG = TheMovieDBQueryTask.class.getSimpleName();
-        private Context context;
-        private AsyncTaskCompleteListener<List<Review>> listener;
+        private final Context context;
+        private final AsyncTaskCompleteListener<List<Review>> listener;
 
     public TheMovieDBReviewQueryTask(Context context, AsyncTaskCompleteListener<List<Review>> listener)
         {
             this.context = context;
             this.listener = listener;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
         }
 
         @Override

@@ -1,7 +1,7 @@
 package com.udacity.popularmovies;
 
 
-public interface AsyncTaskCompleteListener<T>
+interface AsyncTaskCompleteListener<T>
 {
-    public void onTaskComplete(T result);
+    void onTaskComplete(T result);
 }

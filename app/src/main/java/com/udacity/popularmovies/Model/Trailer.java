@@ -5,90 +5,90 @@ import android.os.Parcelable;
 
 public class Trailer implements Parcelable {
 
-    String id;
-    String iso_639_1;
-    String iso_3166_1;
-    String key;
-    String name;
-    String site;
-    int size;
-    String type;
+    private String mId;
+    private String mIso_639_1;
+    private String mIso_3166_1;
+    private String mKey;
+    private String mName;
+    private String mSite;
+    private int mSize;
+    private String mType;
 
     public Trailer() { }
 
     public String getId() {
-        return id;
+        return mId;
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.mId = id;
     }
 
-    public String getIso_639_1() {
-        return iso_639_1;
+    public String getmIso_639_1() {
+        return mIso_639_1;
     }
 
-    public void setIso_639_1(String iso_639_1) {
-        this.iso_639_1 = iso_639_1;
+    public void setmIso_639_1(String mIso_639_1) {
+        this.mIso_639_1 = mIso_639_1;
     }
 
-    public String getIso_3166_1() {
-        return iso_3166_1;
+    public String getmIso_3166_1() {
+        return mIso_3166_1;
     }
 
-    public void setIso_3166_1(String iso_3166_1) {
-        this.iso_3166_1 = iso_3166_1;
+    public void setmIso_3166_1(String mIso_3166_1) {
+        this.mIso_3166_1 = mIso_3166_1;
     }
 
-    public String getKey() {
-        return key;
+    public String getmKey() {
+        return mKey;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setmKey(String mKey) {
+        this.mKey = mKey;
     }
 
     public String getName() {
-        return name;
+        return mName;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.mName = name;
     }
 
-    public String getSite() {
-        return site;
+    public String getmSite() {
+        return mSite;
     }
 
-    public void setSite(String site) {
-        this.site = site;
+    public void setmSite(String mSite) {
+        this.mSite = mSite;
     }
 
-    public int getSize() {
-        return size;
+    public int getmSize() {
+        return mSize;
     }
 
-    public void setSize(int size) {
-        this.size = size;
+    public void setmSize(int mSize) {
+        this.mSize = mSize;
     }
 
     public String getType() {
-        return type;
+        return mType;
     }
 
     public void setType(String type) {
-        this.type = type;
+        this.mType = type;
     }
 
-    public Trailer(Parcel in) {
-        id = in.readString();
-        iso_639_1 = in.readString();
-        iso_3166_1 = in.readString();
-        key = in.readString();
-        name = in.readString();
-        site = in.readString();
-        size = in.readInt();
-        type = in.readString();
+    private Trailer(Parcel in) {
+        mId = in.readString();
+        mIso_639_1 = in.readString();
+        mIso_3166_1 = in.readString();
+        mKey = in.readString();
+        mName = in.readString();
+        mSite = in.readString();
+        mSize = in.readInt();
+        mType = in.readString();
     }
 
     public static final Creator<Trailer> CREATOR = new Creator<Trailer>() {
@@ -110,13 +110,13 @@ public class Trailer implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(id);
-        parcel.writeString(iso_639_1);
-        parcel.writeString(iso_3166_1);
-        parcel.writeString(key);
-        parcel.writeString(name);
-        parcel.writeString(site);
-        parcel.writeInt(size);
-        parcel.writeString(type);
+        parcel.writeString(mId);
+        parcel.writeString(mIso_639_1);
+        parcel.writeString(mIso_3166_1);
+        parcel.writeString(mKey);
+        parcel.writeString(mName);
+        parcel.writeString(mSite);
+        parcel.writeInt(mSize);
+        parcel.writeString(mType);
     }
 }

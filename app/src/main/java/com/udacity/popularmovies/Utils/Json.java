@@ -86,20 +86,20 @@ public class Json {
     private static Movie getMovie(JSONObject result) throws JSONException {
         Movie movie = new Movie();
 
-        movie.setPosterPath(result.optString(JSON_POSTER_PATH_KEY));
-        movie.setAdult(result.getBoolean(JSON_ADULT_KEY));
+        movie.setmPosterPath(result.optString(JSON_POSTER_PATH_KEY));
+        movie.setmAdult(result.optBoolean(JSON_ADULT_KEY));
         movie.setOverview(result.optString(JSON_OVERVIEW_KEY));
-        movie.setReleaseDate(result.optString(JSON_RELEASE_DATE_KEY));
-        movie.setGenreIDs(jsonArrayToList(result.getJSONArray(JSON_GENRE_IDS_KEY)));
+        movie.setmReleaseDate(result.optString(JSON_RELEASE_DATE_KEY));
+        movie.setmGenreIDs(jsonArrayToList(result.optJSONArray(JSON_GENRE_IDS_KEY)));
         movie.setId(result.optString(JSON_ID_KEY));
         movie.setOriginalTitle(result.optString(JSON_ORIGINAL_TITLE_KEY));
-        movie.setOriginalLanguage(result.getString(JSON_ORIGINAL_LANGUAGE_KEY));
+        movie.setOriginalLanguage(result.optString(JSON_ORIGINAL_LANGUAGE_KEY));
         movie.setTitle(result.optString(JSON_TITLE_KEY));
-        movie.setBackdropPath(result.optString(JSON_BACKDROP_PATH_KEY));
-        movie.setPopularity(result.getInt(JSON_POPULARITY_KEY));
-        movie.setVoteCount(result.getInt(JSON_VOTE_COUNT_KEY));
-        movie.setVideo(result.getBoolean(JSON_VIDEO_KEY));
-        movie.setVoteAverage(result.getInt(JSON_VOTE_AVERAGE_KEY));
+        movie.setmBackdropPath(result.optString(JSON_BACKDROP_PATH_KEY));
+        movie.setmPopularity(result.optInt(JSON_POPULARITY_KEY));
+        movie.setmVoteCount(result.getInt(JSON_VOTE_COUNT_KEY));
+        movie.setVideo(result.optBoolean(JSON_VIDEO_KEY));
+        movie.setmVoteAverage(result.optInt(JSON_VOTE_AVERAGE_KEY));
 
         return movie;
     }
@@ -109,23 +109,23 @@ public class Json {
         Trailer trailer = new Trailer();
 
         trailer.setId(result.optString(JSON_ID_KEY));
-        trailer.setIso_639_1(result.optString(JSON_ISO_639_1_KEY));
-        trailer.setIso_3166_1(result.optString(JSON_ISO_3166_1));
-        trailer.setKey(result.optString(JSON_KEY_KEY));
+        trailer.setmIso_639_1(result.optString(JSON_ISO_639_1_KEY));
+        trailer.setmIso_3166_1(result.optString(JSON_ISO_3166_1));
+        trailer.setmKey(result.optString(JSON_KEY_KEY));
         trailer.setName(result.optString(JSON_NAME_KEY));
-        trailer.setSite(result.optString(JSON_SITE_KEY));
-        trailer.setSize(result.optInt(JSON_SIZE_KEY));
+        trailer.setmSite(result.optString(JSON_SITE_KEY));
+        trailer.setmSize(result.optInt(JSON_SIZE_KEY));
         trailer.setType(result.getString(JSON_TYPE_KEY));
 
         return trailer;
     }
 
     @NonNull
-    private static Review getReview(JSONObject result) throws JSONException {
+    private static Review getReview(JSONObject result) {
         Review review = new Review();
 
-        review.setAuthor(result.optString(JSON_AUTHOR));
-        review.setContent(result.optString(JSON_CONTENT));
+        review.setmAuthor(result.optString(JSON_AUTHOR));
+        review.setmContent(result.optString(JSON_CONTENT));
 
         return review;
     }

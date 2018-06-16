@@ -11,8 +11,7 @@ import android.support.annotation.NonNull;
 import com.udacity.popularmovies.Database.MovieContract.*;
 import com.udacity.popularmovies.Model.Movie;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Objects;
 
 public class MovieDbHelper extends SQLiteOpenHelper{
 
@@ -80,17 +79,16 @@ public class MovieDbHelper extends SQLiteOpenHelper{
             sqliteQueryBuilder.appendWhere("_id" + " = " + id);
         }
 
-        if(sortOrder == null || sortOrder == "") {
+        if(sortOrder == null || Objects.equals(sortOrder, "")) {
             sortOrder = MovieEntry._ID;
         }
-        Cursor cursor = sqliteQueryBuilder.query(getReadableDatabase(),
+        return sqliteQueryBuilder.query(getReadableDatabase(),
                 projection,
                 selection,
                 selectionArgs,
                 null,
                 null,
                 sortOrder);
-        return cursor;
     }
 
     @NonNull
@@ -98,20 +96,20 @@ public class MovieDbHelper extends SQLiteOpenHelper{
         Movie movie;
         movie = new Movie();
         movie.setId(cursor.getString(cursor.getColumnIndex(MovieEntry._ID)));
-        movie.setPosterPath(cursor.getString(cursor.getColumnIndex(MovieEntry.COLUMN_NAME_POSTER_PATH)));
+        movie.setmPosterPath(cursor.getString(cursor.getColumnIndex(MovieEntry.COLUMN_NAME_POSTER_PATH)));
         movie.setTitle(cursor.getString(cursor.getColumnIndex(MovieEntry.COLUMN_NAME_TITLE)));
-        boolean isAdult = cursor.getColumnIndex(MovieEntry.COLUMN_NAME_ADULT) == 0 ? true : false;
-        movie.setAdult(isAdult);
+        boolean isAdult = cursor.getColumnIndex(MovieEntry.COLUMN_NAME_ADULT) == 0;
+        movie.setmAdult(isAdult);
         movie.setOverview(cursor.getString(cursor.getColumnIndex(MovieEntry.COLUMN_NAME_OVERVIEW)));
-        movie.setReleaseDate(cursor.getString(cursor.getColumnIndex(MovieEntry.COLUMN_NAME_RELEASE_DATE)));
+        movie.setmReleaseDate(cursor.getString(cursor.getColumnIndex(MovieEntry.COLUMN_NAME_RELEASE_DATE)));
         movie.setOriginalTitle(cursor.getString(cursor.getColumnIndex(MovieEntry.COLUMN_NAME_ORIGINAL_TITLE)));
         movie.setOriginalLanguage(cursor.getString(cursor.getColumnIndex(MovieEntry.COLUMN_NAME_ORIGINAL_LANGUAGE)));
-        movie.setBackdropPath(cursor.getString(cursor.getColumnIndex(MovieEntry.COLUMN_NAME_BACKDROP_PATH)));
-        movie.setPopularity(cursor.getInt(cursor.getColumnIndex(MovieEntry.COLUMN_NAME_POPULARITY)));
-        movie.setVoteCount(cursor.getInt(cursor.getColumnIndex(MovieEntry.COLUMN_NAME_VOTE_COUNT)));
-        boolean isVideo = cursor.getColumnIndex(MovieEntry.COLUMN_NAME_VIDEO) == 0 ? true : false;
+        movie.setmBackdropPath(cursor.getString(cursor.getColumnIndex(MovieEntry.COLUMN_NAME_BACKDROP_PATH)));
+        movie.setmPopularity(cursor.getInt(cursor.getColumnIndex(MovieEntry.COLUMN_NAME_POPULARITY)));
+        movie.setmVoteCount(cursor.getInt(cursor.getColumnIndex(MovieEntry.COLUMN_NAME_VOTE_COUNT)));
+        boolean isVideo = cursor.getColumnIndex(MovieEntry.COLUMN_NAME_VIDEO) == 0;
         movie.setVideo(isVideo);
-        movie.setVoteAverage(cursor.getInt(cursor.getColumnIndex(MovieEntry.COLUMN_NAME_VOTE_AVERAGE)));
+        movie.setmVoteAverage(cursor.getInt(cursor.getColumnIndex(MovieEntry.COLUMN_NAME_VOTE_AVERAGE)));
         return movie;
     }
 }

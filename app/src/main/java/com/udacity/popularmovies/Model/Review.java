@@ -5,30 +5,30 @@ import android.os.Parcelable;
 
 public class Review implements Parcelable {
 
-    String author;
-    String content;
+    private String mAuthor;
+    private String mContent;
 
     public Review(){}
 
-    public String getAuthor() {
-        return author;
+    public String getmAuthor() {
+        return mAuthor;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setmAuthor(String mAuthor) {
+        this.mAuthor = mAuthor;
     }
 
-    public String getContent() {
-        return content;
+    public String getmContent() {
+        return mContent;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setmContent(String mContent) {
+        this.mContent = mContent;
     }
 
-    protected Review(Parcel in) {
-        author = in.readString();
-        content = in.readString();
+    private Review(Parcel in) {
+        mAuthor = in.readString();
+        mContent = in.readString();
     }
 
     public static final Creator<Review> CREATOR = new Creator<Review>() {
@@ -50,7 +50,7 @@ public class Review implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(author);
-        parcel.writeString(content);
+        parcel.writeString(mAuthor);
+        parcel.writeString(mContent);
     }
 }
