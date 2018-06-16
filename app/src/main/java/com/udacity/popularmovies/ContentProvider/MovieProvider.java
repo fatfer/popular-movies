@@ -45,42 +45,56 @@ public class MovieProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
-        String id = null;
+
         if(uriMatcher.match(uri) == MOVIE_ID) {
-            id = uri.getPathSegments().get(1);
+            String id = uri.getPathSegments().get(1);
+            return dbHelper.getMovies(id, projection, selection, selectionArgs, sortOrder);
+        }else if(uriMatcher.match(uri) == MOVIES){
+            return dbHelper.getMovies(null, projection, selection, selectionArgs, sortOrder);
         }
-        return dbHelper.getMovies(id, projection, selection, selectionArgs, sortOrder);
+        else{
+            throw new UnsupportedOperationException("uri not found: " + uri);
+        }
+
     }
 
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
+        if(uriMatcher.match(uri) == MOVIES) {
+            long id = dbHelper.addMovie(values);
+            getContext().getContentResolver().notifyChange(uri, null);
 
-        long id = dbHelper.addMovie(values);
-        getContext().getContentResolver().notifyChange(uri, null);
-
-        if(id > 0) {
-            return Uri.parse(CONTENT_URI + "/" + id);
+            if (id > 0) {
+                return Uri.parse(CONTENT_URI + "/" + id);
+            } else {
+                throw new SQLException("Failed to insert into " + uri);
+            }
         }else{
-            throw new SQLException("Failed to insert into " + uri);
+            throw new UnsupportedOperationException("uri not found: " + uri);
         }
     }
 
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
-        String id = null;
+
         if(uriMatcher.match(uri) == MOVIE_ID) {
-            id = uri.getPathSegments().get(1);
+            String id = uri.getPathSegments().get(1);
+            return dbHelper.deleteMovie(id);
+        }else{
+            throw new UnsupportedOperationException("uri not found: " + uri);
         }
-        return dbHelper.deleteMovie(id);
+
     }
 
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
-        String id = null;
+
         if(uriMatcher.match(uri) == MOVIE_ID) {
-            id = uri.getPathSegments().get(1);
+           String id = uri.getPathSegments().get(1);
+            return dbHelper.updateMovie(id, values);
+        }else{
+            throw new UnsupportedOperationException("uri not found: " + uri);
         }
-        return dbHelper.updateMovie(id, values);
     }
 }
